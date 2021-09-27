@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const usuario = require('./routes/usuarios');
+const curso = require('./routes/cursos');
 
 // Conectando a DB
 mongoose.connect('mongodb://localhost:27017/test')
@@ -16,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Habilitar Routers
 app.use('/api/usuarios', usuario);
-
+app.use('/api/cursos', curso);
 
 
 
