@@ -2,14 +2,17 @@
   "name": "api-rest-mongo",
   "version": "1.0.0",
   "description": "API Rest MongoDB",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon app.js"
   },
   "author": "Lucas Seijo",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
     "mongoose": "^6.0.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.13"
   }
 }
