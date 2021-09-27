@@ -30,6 +30,16 @@ router.put('/:email', (req, res) => {
         });
 });
 
+router.delete('/:email', (req, res) => {
+    let resultado = desactivarUsuario(req.params.email);
+    resultado
+        .then(user => {
+            res.json({user});
+        }).catch(error => {
+            res.status(400).json(error.message);
+        });
+})
+
 const crearUsuario = async (body) => {
     const {email, nombre, password} = body;
 
@@ -44,9 +54,19 @@ const crearUsuario = async (body) => {
 
 const editarUsuario = async (email, body) => {
     const {nombre, password} = body;
-    let usuario = await Usuario.findOneAndUpdate(email, {
+    let usuario = await Usuario.findOneAndUpdate({email: email}, {
         $set: {
             nombre, password
+        }
+    }, {new: true});
+
+    return usuario;
+}
+
+const desactivarUsuario = async email => {
+    let usuario = await Usuario.findOneAndUpdate({email: email}, {
+        $set: {
+            estado: false
         }
     }, {new: true});
 
