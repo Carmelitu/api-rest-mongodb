@@ -3,7 +3,14 @@ const router = express.Router();
 const Usuario = require('../models/usuario_model');
 
 router.get('/', (req, res) => {
-    res.json('Get de Usuarios OK');
+    let resultado = listarUsuariosActivos();
+    resultado
+        .then( users => {
+            res.json(users);
+        })
+        .catch(error => {
+            res.status(400).json(error.message);
+        });
 });
 
 router.post('/', (req, res) => {
@@ -71,6 +78,11 @@ const desactivarUsuario = async email => {
     }, {new: true});
 
     return usuario;
+}
+
+const listarUsuariosActivos = async () => {
+    let usuarios = await Usuario.find({"estado": true});
+    return usuarios;
 }
 
 module.exports = router;
