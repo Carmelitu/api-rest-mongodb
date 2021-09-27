@@ -20,6 +20,16 @@ router.post('/', (req, res) => {
         
 });
 
+router.put('/:email', (req, res) => {
+    let resultado = editarUsuario(req.params.email, req.body);
+    resultado
+        .then(user => {
+            res.json({user});
+        }).catch(error => {
+            res.status(400).json(error.message);
+        });
+});
+
 const crearUsuario = async (body) => {
     const {email, nombre, password} = body;
 
@@ -30,6 +40,17 @@ const crearUsuario = async (body) => {
     });
 
     return await usuario.save();
+}
+
+const editarUsuario = async (email, body) => {
+    const {nombre, password} = body;
+    let usuario = await Usuario.findOneAndUpdate(email, {
+        $set: {
+            nombre, password
+        }
+    }, {new: true});
+
+    return usuario;
 }
 
 module.exports = router;
