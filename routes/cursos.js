@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Curso = require('../models/curso_model');
-const Joi = require('joi');
 
 router.get('/', (req, res) => {
     let resultado = listarCursosActivos();
