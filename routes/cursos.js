@@ -21,6 +21,13 @@ router.put('/:id', (req, res) => {
         .catch(error => res.status(400).json(error));
 });
 
+router.delete('/:id', (req, res) => {
+    let resultado = desactivarCurso(req.params.id);
+    resultado
+        .then(curso => res.json(curso))
+        .catch(error => res.status(400).json(error));
+});
+
 const crearCurso = async (body) => {
     const {titulo, descripcion} = body;
 
@@ -37,6 +44,16 @@ const editarCurso = async (id, body) => {
     let curso = await Curso.findByIdAndUpdate(id, {
         $set: {
             titulo, descripcion
+        }
+    }, {new: true});
+
+    return curso;
+}
+
+const desactivarCurso = async id => {
+    let curso = await Curso.findByIdAndUpdate(id, {
+        $set: {
+            estado: false
         }
     }, {new: true});
 
