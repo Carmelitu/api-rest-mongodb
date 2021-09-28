@@ -4,7 +4,10 @@ const Curso = require('../models/curso_model');
 const Joi = require('joi');
 
 router.get('/', (req, res) => {
-    res.json('Get de Cursos OK');
+    let resultado = listarCursosActivos();
+    resultado
+        .then(curso => res.json(curso))
+        .catch(error => res.status(400).json(error));
 });
 
 router.post('/', (req, res) => {
@@ -58,6 +61,11 @@ const desactivarCurso = async id => {
     }, {new: true});
 
     return curso;
+}
+
+const listarCursosActivos = async () => {
+    let cursos = await Curso.find({"estado": true});
+    return cursos;
 }
 
 module.exports = router;
