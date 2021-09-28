@@ -12,7 +12,14 @@ router.post('/', (req, res) => {
     resultado
         .then(curso => res.json(curso))
         .catch(error => res.status(400).json(error));
-})
+});
+
+router.put('/:id', (req, res) => {
+    let resultado = editarCurso(req.params.id, req.body);
+    resultado
+        .then(curso => res.json(curso))
+        .catch(error => res.status(400).json(error));
+});
 
 const crearCurso = async (body) => {
     const {titulo, descripcion} = body;
@@ -23,6 +30,17 @@ const crearCurso = async (body) => {
     });
 
     return await curso.save();
+}
+
+const editarCurso = async (id, body) => {
+    const {titulo, descripcion} = body;
+    let curso = await Curso.findByIdAndUpdate(id, {
+        $set: {
+            titulo, descripcion
+        }
+    }, {new: true});
+
+    return curso;
 }
 
 module.exports = router;
