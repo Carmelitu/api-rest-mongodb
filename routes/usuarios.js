@@ -90,6 +90,11 @@ router.delete('/:email', (req, res) => {
         });
 })
 
+
+
+/* -------------------------------------------------------------------------------------------------------- */
+// Funciones helpers
+
 const crearUsuario = async (body) => {
     const {email, nombre, password} = body;
 
@@ -99,11 +104,10 @@ const crearUsuario = async (body) => {
         password
     });
 
-    return await usuario.save();
-}
+    await usuario.save()
 
-/* -------------------------------------------------------------------------------------------------------- */
-// Funciones helpers
+    return usuario.email;
+}
 
 const editarUsuario = async (email, body) => {
     const {nombre, password} = body;
@@ -111,7 +115,8 @@ const editarUsuario = async (email, body) => {
         $set: {
             nombre, password
         }
-    }, {new: true});
+    }, {new: true})
+        .select({nombre: 1, email: 1});
 
     return usuario;
 }
@@ -121,13 +126,15 @@ const desactivarUsuario = async email => {
         $set: {
             estado: false
         }
-    }, {new: true});
+    }, {new: true})
+        .select({nombre: 1, email: 1});
 
     return usuario;
 }
 
 const listarUsuariosActivos = async () => {
-    let usuarios = await Usuario.find({"estado": true});
+    let usuarios = await Usuario.find({"estado": true})
+        .select({nombre: 1, email: 1});
     return usuarios;
 }
 
