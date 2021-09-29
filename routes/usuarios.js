@@ -34,6 +34,18 @@ router.post('/', (req, res) => {
     let body = req.body;
     const {nombre, password, email} = body;
 
+    // No duplicar mail
+    Usuario.findOne({email}, (error, user) => {
+        if(error){
+            return res.status(400).json({error: 'Server Error'});
+        }
+
+        if(user){
+            // Usuario existe
+            return res.status(400).json({mensaje: 'El usuario ya existe'});
+        }
+    });
+
     // Validacion con Joi
     const {error, value} = schema.validate({nombre, password, email});
 
