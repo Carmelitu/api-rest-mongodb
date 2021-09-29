@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Usuario = require('../models/usuario_model');
 const Joi = require('joi');
+const bcrypt = require('bcrypt');
 
 // Schema de Joi para validar datos
 const schema = Joi.object({
@@ -34,18 +35,6 @@ router.post('/', (req, res) => {
     let body = req.body;
     const {nombre, password, email} = body;
 
-    // No duplicar mail
-    Usuario.findOne({email}, (error, user) => {
-        if(error){
-            return res.status(400).json({error: 'Server Error'});
-        }
-
-        if(user){
-            // Usuario existe
-            return res.status(400).json({mensaje: 'El usuario ya existe'});
-        }
-    });
-
     // Validacion con Joi
     const {error, value} = schema.validate({nombre, password, email});
 
@@ -54,16 +43,30 @@ router.post('/', (req, res) => {
         return;
     }
 
-    let resultado = crearUsuario(body);
-
-    resultado
-        .then( user => {
-            res.json({user});
+    let resultado = crearUsuario(body)
+ 
+    //resolvemos la promesa que nos da la funcion crearUsuario
+    resultado.then(user => {
+        //en caso de que el usuario no existe manda los datos
+        if(user){
+            //respondemos a la solicitud
+            res.json({
+                nombre: user.nombre,
+                email: user.email
+            })
+        //en caso de que existe enviamos un status 400 con el error
+        }else{
+            res.status(400).json({
+                error: 'El usuario ya ha sido creado'
+            });
+        }
+    }).catch((err) => {
+        console.log(err)
+        //mandamos un status 400 por el error y la respuesta en json
+        res.status(400).json({
+            error: err
         })
-        .catch(error => {
-            res.status(400).json(error.message);
-        });
-        
+    })
 });
 
 // Edición de Usuario (solo nombre y password)
@@ -110,15 +113,21 @@ router.delete('/:email', (req, res) => {
 const crearUsuario = async (body) => {
     const {email, nombre, password} = body;
 
-    let usuario = new Usuario({
-        email,
-        nombre,
-        password
-    });
+    //hacemos una consulta con el email
+    let emailDuplicado = await Usuario.findOne({email: body.email});
 
-    await usuario.save()
-
-    return usuario.email;
+    if (emailDuplicado){
+        return;
+    } else {
+        // creamos una instancia de usuarios que es el modelo
+        let usuario = new Usuario({
+            email,
+            nombre,
+            password: bcrypt.hashSync(password, 10)
+        });
+        // guardamos al usuario y retornamos su resultado
+        return await usuario.save();
+    }    
 }
 
 const editarUsuario = async (email, body) => {
