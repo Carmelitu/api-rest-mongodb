@@ -8,7 +8,6 @@ const verificarToken = (req, res, next) => {
             return res.status(401).json(error);
         }
         req.usuario = decoded.usuario;
-
         next();
     });
 }

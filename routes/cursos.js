@@ -11,7 +11,7 @@ router.get('/', verificarToken, (req, res) => {
 });
 
 router.post('/', verificarToken, (req, res) => {
-    let resultado = crearCurso(req.body);
+    let resultado = crearCurso(req);
     resultado
         .then(curso => res.json(curso))
         .catch(error => res.status(400).json(error));
@@ -31,11 +31,12 @@ router.delete('/:id', verificarToken, (req, res) => {
         .catch(error => res.status(400).json(error));
 });
 
-const crearCurso = async (body) => {
-    const {titulo, descripcion} = body;
+const crearCurso = async (req) => {
+    const {titulo, descripcion} = req.body;
 
     let curso = new Curso({
         titulo,
+        autor: req.usuario._id,
         descripcion
     });
 
@@ -64,7 +65,9 @@ const desactivarCurso = async id => {
 }
 
 const listarCursosActivos = async () => {
-    let cursos = await Curso.find({"estado": true});
+    let cursos = await Curso
+        .find({"estado": true})
+        .populate('autor', 'nombre -_id');
     return cursos;
 }
 

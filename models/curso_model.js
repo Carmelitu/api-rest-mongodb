@@ -6,6 +6,10 @@ const cursoSchema = new Schema({
         type: String,
         required: true
     },
+    autor:{
+        type: Schema.Types.ObjectId,
+        ref: 'Usuario'
+    },
     descripcion: {
         type: String,
         required: false

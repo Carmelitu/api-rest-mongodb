@@ -17,7 +17,7 @@ router.post('/', (req, res) => {
                     return res.status(400).json({error: 'Usuario o contraseña incorrecta'});
                 }
                 const jwToken = jwt.sign({
-                    data: {_id: datos._id, nombre: datos.nombre, email: datos.email}
+                    usuario: {_id: datos._id, nombre: datos.nombre, email: datos.email}
                 }, config.get('configToken.SEED'), {expiresIn: config.get('configToken.expiration')});
                 //jwt.sign({_id: datos._id, nombre: datos.nombre, email: datos.email}, 'password');
                 res.json({
