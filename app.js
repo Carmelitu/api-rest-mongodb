@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 const usuario = require('./routes/usuarios');
 const curso = require('./routes/cursos');
 const auth = require('./routes/auth');
+const config = require('config');
 
 // Conectando a DB
-mongoose.connect('mongodb://localhost:27017/test')
+mongoose.connect(config.get('configDB.HOST'))
     .then( () => console.log('Conectado a MongoDB'))
     .catch( error => console.log(error));
 
