@@ -1,8 +1,11 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 const router = express.Router();
 const Usuario = require('../models/usuario_model');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
+const { json } = require('express');
 
 // Schema de Joi para validar datos
 const schema = Joi.object({
@@ -16,10 +19,22 @@ const schema = Joi.object({
 
     email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
-})
+});
+
+let verificarToken = (req, res, next) => {
+    let token = req.get('Authorization');
+    jwt.verify(token, config.get('configToken.SEED'), (error, decoded) => {
+        if(error){
+            return res.status(401).json(error);
+        }
+        req.usuario = decoded.usuario;
+
+        next();
+    });
+}
 
 // Get para listado de usuarios activos
-router.get('/', (req, res) => {
+router.get('/', verificarToken, (req, res) => {
     let resultado = listarUsuariosActivos();
     resultado
         .then( users => {
