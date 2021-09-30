@@ -5,7 +5,7 @@ const router = express.Router();
 const Usuario = require('../models/usuario_model');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
-const { json } = require('express');
+const verificarToken = require('../middlewares/auth');
 
 // Schema de Joi para validar datos
 const schema = Joi.object({
@@ -20,18 +20,6 @@ const schema = Joi.object({
     email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
 });
-
-let verificarToken = (req, res, next) => {
-    let token = req.get('Authorization');
-    jwt.verify(token, config.get('configToken.SEED'), (error, decoded) => {
-        if(error){
-            return res.status(401).json(error);
-        }
-        req.usuario = decoded.usuario;
-
-        next();
-    });
-}
 
 // Get para listado de usuarios activos
 router.get('/', verificarToken, (req, res) => {
@@ -85,7 +73,7 @@ router.post('/', (req, res) => {
 });
 
 // Edición de Usuario (solo nombre y password)
-router.put('/:email', (req, res) => {
+router.put('/:email', verificarToken, (req, res) => {
 
     let body = req.body;
     let email = req.params.email;
@@ -110,7 +98,7 @@ router.put('/:email', (req, res) => {
 });
 
 // Se da de baja usuario sin eliminarlo
-router.delete('/:email', (req, res) => {
+router.delete('/:email', verificarToken, (req, res) => {
     let resultado = desactivarUsuario(req.params.email);
     resultado
         .then(user => {
